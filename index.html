@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Chat</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Auth Container (Login/Signup) -->
+        <div id="auth-container" class="auth-container">
+            <h1>Chat App</h1>
+            <div class="tabs">
+                <button id="login-tab" class="tab active">Login</button>
+                <button id="signup-tab" class="tab">Signup</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <p id="login-error" class="error"></p>
+            </form>
+            
+            <!-- Signup Form -->
+            <form id="signup-form" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-username">Username</label>
+                    <input type="text" id="signup-username" required>
+                </div>
+                <button type="submit" class="btn">Signup</button>
+                <p id="signup-error" class="error"></p>
+            </form>
+        </div>
+        
+        <!-- Chat Container -->
+        <div id="chat-container" class="chat-container" style="display: none;">
+            <div class="chat-header">
+                <h2>Chat Room</h2>
+                <button id="logout-btn" class="btn-small">Logout</button>
+            </div>
+            
+            <div id="messages-container" class="messages-container"></div>
+            
+            <form id="message-form" class="message-form">
+                <input type="text" id="message-input" placeholder="Type a message..." required>
+                <button type="submit" class="btn-send">Send</button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+</body>
+</html> 
