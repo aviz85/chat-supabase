@@ -1,7 +1,19 @@
 // Initialize Supabase client
 const SUPABASE_URL = 'https://paoemykauclmgkwhzcju.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhb2VteWthdWNsbWdrd2h6Y2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MzI1MDQsImV4cCI6MjA1OTMwODUwNH0.isxNKSns8LLFayGFYLhWHximiPwa65U3V1MFuzNSNRM';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Site URL for authentication redirects (localhost and Netlify URL)
+const SITE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+  ? window.location.origin 
+  : 'https://musical-pegasus-13b46c.netlify.app';
+  
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    redirectTo: SITE_URL
+  }
+});
 
 // DOM Elements
 const authContainer = document.getElementById('auth-container');
@@ -95,23 +107,37 @@ signupForm.addEventListener('submit', async (e) => {
         
         // If signup was successful
         if (data.user) {
-            // Create a profile entry in the profiles table
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .insert([
-                    {
-                        id: data.user.id,
-                        username,
-                        created_at: new Date().toISOString()
-                    }
-                ]);
-                
-            if (profileError) throw profileError;
+            // Check if email confirmation is required
+            if (data.session === null) {
+                // Email confirmation is required
+                signupForm.reset();
+                signupError.style.color = '#4f46e5'; // Change color to indicate this is a success message
+                signupError.textContent = 'הרשמה בוצעה בהצלחה! נשלח אליך מייל לאימות החשבון. אנא בדוק את תיבת הדואר שלך ולחץ על הקישור לאימות.';
+                return;
+            }
             
-            currentUser = data.user;
-            showChatInterface();
-            loadMessages();
-            subscribeToMessages();
+            // If no confirmation needed or already confirmed
+            try {
+                // Create a profile entry in the profiles table
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .insert([
+                        {
+                            id: data.user.id,
+                            username,
+                            created_at: new Date().toISOString()
+                        }
+                    ]);
+                    
+                if (profileError) throw profileError;
+                
+                currentUser = data.user;
+                showChatInterface();
+                loadMessages();
+                subscribeToMessages();
+            } catch (profileError) {
+                signupError.textContent = `שגיאה ביצירת פרופיל: ${profileError.message}`;
+            }
         }
     } catch (error) {
         signupError.textContent = error.message;
